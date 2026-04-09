@@ -14,7 +14,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/setupdesk.git'
+                git branch: 'main', url: 'https://github.com/nadil1995/Digital_foundation.git'
             }
         }
 
