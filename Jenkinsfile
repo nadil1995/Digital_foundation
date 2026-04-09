@@ -47,41 +47,34 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-            steps {
-                sshagent([SSH_CREDENTIALS]) {
-                    sh '''
-                        echo "Preparing app directory on EC2..."
-                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "mkdir -p $APP_DIR"
+       stage('Deploy to EC2') {
+    steps {
+        sshagent(['ubuntu']) {
+            sh """
+                ssh -o StrictHostKeyChecking=no ubuntu@13.42.33.166 '
+                    cd /home/ubuntu/setupdesk
 
-                        echo "Copying compose file to EC2..."
-                        scp -o StrictHostKeyChecking=no docker-compose.yml $EC2_USER@$EC2_HOST:$APP_DIR/docker-compose.yml
+                    echo "Stopping old container..."
+                    docker stop setupdesk-app 2>/dev/null || true
+                    docker rm   setupdesk-app 2>/dev/null || true
 
-                        echo "Deploying on EC2..."
-                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
-                            cd $APP_DIR
+                    echo "Pulling latest image..."
+                    docker pull nadil95/setupdesk-frontend:latest
 
-                            echo 'Stopping old container...'
-                            sudo docker stop setupdesk-app 2>/dev/null || true
-                            sudo docker rm   setupdesk-app 2>/dev/null || true
+                    echo "Starting container..."
+                    docker run -d \\
+                        --name setupdesk-app \\
+                        --restart unless-stopped \\
+                        -p 4173:4173 \\
+                        nadil95/setupdesk-frontend:latest
 
-                            echo 'Pulling latest image...'
-                            sudo docker pull $DOCKER_IMAGE
-
-                            echo 'Starting container...'
-                            sudo docker run -d \
-                                --name setupdesk-app \
-                                --restart unless-stopped \
-                                -p $PORT:$PORT \
-                                $DOCKER_IMAGE
-
-                            echo 'Running containers:'
-                            sudo docker ps --filter name=setupdesk-app
-                        "
-                    '''
-                }
-            }
+                    echo "Running containers:"
+                    docker ps --filter name=setupdesk-app
+                '
+            """
         }
+    }
+}
 
         stage('Health Check') {
             steps {
