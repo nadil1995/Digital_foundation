@@ -47,34 +47,34 @@ pipeline {
             }
         }
 
-       stage('Deploy to EC2') {
-    steps {
-        sshagent(['ubuntu']) {
-            sh """
-                ssh -o StrictHostKeyChecking=no ubuntu@13.42.33.166 '
-                    cd /home/ubuntu/setupdesk
+        stage('Deploy to EC2') {
+            steps {
+                sshagent([SSH_CREDENTIALS]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
+                            mkdir -p $APP_DIR
 
-                    echo "Stopping old container..."
-                    docker stop setupdesk-app 2>/dev/null || true
-                    docker rm   setupdesk-app 2>/dev/null || true
+                            echo "Stopping old container..."
+                            docker stop setupdesk-app 2>/dev/null || true
+                            docker rm   setupdesk-app 2>/dev/null || true
 
-                    echo "Pulling latest image..."
-                    docker pull nadil95/setupdesk-frontend:latest
+                            echo "Pulling latest image..."
+                            docker pull $DOCKER_IMAGE
 
-                    echo "Starting container..."
-                    docker run -d \\
-                        --name setupdesk-app \\
-                        --restart unless-stopped \\
-                        -p 4173:4173 \\
-                        nadil95/setupdesk-frontend:latest
+                            echo "Starting container..."
+                            docker run -d \\
+                                --name setupdesk-app \\
+                                --restart unless-stopped \\
+                                -p $PORT:$PORT \\
+                                $DOCKER_IMAGE
 
-                    echo "Running containers:"
-                    docker ps --filter name=setupdesk-app
-                '
-            """
+                            echo "Running containers:"
+                            docker ps --filter name=setupdesk-app
+                        '
+                    """
+                }
+            }
         }
-    }
-}
 
         stage('Health Check') {
             steps {
