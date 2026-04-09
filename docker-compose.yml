@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        VITE_FORMSPREE_ID: ${VITE_FORMSPREE_ID}
+    ports:
+      - "4173:4173"
+    volumes: []
+    restart: unless-stopped
