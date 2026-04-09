@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE    = "nadil95/setupdesk-frontend:latest"
-        EC2_HOST        = "13.42.33.166"
-        EC2_USER        = "ubuntu"
-        SSH_CREDENTIALS = "ssh-setupdesk" // Jenkins credential ID for SSH key
-        APP_DIR         = "/home/ubuntu/setupdesk"
-        PORT            = "4173"
+        DOCKER_IMAGE     = "nadil95/setupdesk-frontend:latest"
+        EC2_HOST         = "13.42.33.166"
+        EC2_USER         = "ubuntu"
+        SSH_CREDENTIALS  = "ssh-setupdesk"
+        APP_DIR          = "/home/ubuntu/setupdesk"
+        PORT             = "4173"
+        FORMSPREE_ID     = "mkopyqev"
     }
 
     stages {
@@ -25,10 +26,6 @@ pipeline {
                         credentialsId: 'dockerhub',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
-                    ),
-                    string(
-                        credentialsId: 'VITE_FORMSPREE_ID',
-                        variable: 'FORMSPREE_ID'
                     )
                 ]) {
                     sh '''
