@@ -2,86 +2,112 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME   = 'setupdesk-frontend'
-        CONTAINER    = 'setupdesk-app'
-        PORT         = '4173'
-        FORMSPREE_ID = credentials('VITE_FORMSPREE_ID')   // Jenkins credential ID
+        DOCKER_IMAGE    = "nadil95/setupdesk-frontend:latest"
+        EC2_HOST        = "13.42.33.166"
+        EC2_USER        = "ubuntu"
+        SSH_CREDENTIALS = "ssh-setupdesk" // Jenkins credential ID for SSH key
+        APP_DIR         = "/home/ubuntu/setupdesk"
+        PORT            = "4173"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/setupdesk.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Image') {
             steps {
-                sh """
-                    docker build \
-                      --build-arg VITE_FORMSPREE_ID=${FORMSPREE_ID} \
-                      --no-cache \
-                      -t ${IMAGE_NAME}:${BUILD_NUMBER} \
-                      -t ${IMAGE_NAME}:latest \
-                      .
-                """
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    ),
+                    string(
+                        credentialsId: 'VITE_FORMSPREE_ID',
+                        variable: 'FORMSPREE_ID'
+                    )
+                ]) {
+                    sh '''
+                        echo "Logging in to Docker Hub..."
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                        echo "Building Docker image..."
+                        export DOCKER_BUILDKIT=0
+                        docker build \
+                            --build-arg VITE_FORMSPREE_ID=$FORMSPREE_ID \
+                            -t $DOCKER_IMAGE .
+
+                        echo "Pushing image to Docker Hub..."
+                        docker push $DOCKER_IMAGE
+
+                        docker logout
+                    '''
+                }
             }
         }
 
-        stage('Stop & Remove Old Container') {
+        stage('Deploy to EC2') {
             steps {
-                sh """
-                    docker stop ${CONTAINER} || true
-                    docker rm   ${CONTAINER} || true
-                """
-            }
-        }
+                sshagent([SSH_CREDENTIALS]) {
+                    sh '''
+                        echo "Preparing app directory on EC2..."
+                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "mkdir -p $APP_DIR"
 
-        stage('Run New Container') {
-            steps {
-                sh """
-                    docker run -d \
-                      --name ${CONTAINER} \
-                      --restart unless-stopped \
-                      -p ${PORT}:${PORT} \
-                      ${IMAGE_NAME}:latest
-                """
+                        echo "Copying compose file to EC2..."
+                        scp -o StrictHostKeyChecking=no docker-compose.yml $EC2_USER@$EC2_HOST:$APP_DIR/docker-compose.yml
+
+                        echo "Deploying on EC2..."
+                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
+                            cd $APP_DIR
+
+                            echo 'Stopping old container...'
+                            sudo docker stop setupdesk-app 2>/dev/null || true
+                            sudo docker rm   setupdesk-app 2>/dev/null || true
+
+                            echo 'Pulling latest image...'
+                            sudo docker pull $DOCKER_IMAGE
+
+                            echo 'Starting container...'
+                            sudo docker run -d \
+                                --name setupdesk-app \
+                                --restart unless-stopped \
+                                -p $PORT:$PORT \
+                                $DOCKER_IMAGE
+
+                            echo 'Running containers:'
+                            sudo docker ps --filter name=setupdesk-app
+                        "
+                    '''
+                }
             }
         }
 
         stage('Health Check') {
             steps {
-                sh """
-                    sleep 5
-                    curl -sf http://localhost:${PORT}/ || (echo 'Health check failed' && exit 1)
-                    echo 'Deployment successful — SetupDesk is live on port ${PORT}'
-                """
-            }
-        }
-
-        stage('Cleanup Old Images') {
-            steps {
-                sh "docker image prune -f --filter 'label!=keep'"
+                sh '''
+                    sleep 10
+                    curl --retry 5 --retry-delay 3 --silent --fail \
+                        http://$EC2_HOST:$PORT/ > /dev/null \
+                        && echo "SetupDesk is live at http://$EC2_HOST:$PORT" \
+                        || echo "Warning: site not reachable — check EC2 security group port $PORT"
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "✅ SetupDesk deployed successfully — build #${BUILD_NUMBER}"
+            echo "Deployment successful! SetupDesk: http://${EC2_HOST}:${PORT}"
         }
         failure {
-            echo "❌ Deployment failed — rolling back"
-            sh """
-                docker stop ${CONTAINER} || true
-                docker rm   ${CONTAINER} || true
-                docker run -d \
-                  --name ${CONTAINER} \
-                  --restart unless-stopped \
-                  -p ${PORT}:${PORT} \
-                  ${IMAGE_NAME}:previous || true
-            """
+            echo "Pipeline failed — check logs above."
+        }
+        always {
+            cleanWs()
         }
     }
 }
