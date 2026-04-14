@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE     = "nadil95/setupdesk-frontend:latest"
-        EC2_HOST         = "13.42.33.166"
+        EC2_HOST         = "18.135.179.245"
         EC2_USER         = "ubuntu"
         SSH_CREDENTIALS  = "ssh-setupdesk"
         APP_DIR          = "/home/ubuntu/setupdesk"
