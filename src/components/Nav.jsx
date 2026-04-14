@@ -17,10 +17,11 @@ export default function Nav() {
   function close() { setMenuOpen(false) }
 
   const links = [
-    { href: '#how-it-works', label: 'How It Works' },
-    { href: '#pricing',      label: 'Pricing' },
-    { href: '#addons',       label: 'Add-ons' },
-    { href: '#why',          label: 'Why Us' },
+    { href: '#how-it-works',   label: 'How It Works' },
+    { href: '#pricing',        label: 'Pricing'       },
+    { href: '#addons',         label: 'Add-ons'       },
+    { href: '#questionnaire',  label: 'Find My Plan'  },
+    { href: '#why',            label: 'Why Us'        },
   ]
 
   return (

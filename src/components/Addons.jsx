@@ -6,9 +6,9 @@ const addons = [
   { emoji: '📊', name: 'Investor Pitch Deck',       price: '£249', value: 'Add-on: Investor Pitch Deck — £249' },
   { emoji: '📱', name: 'Social Media Setup',        price: '£99',  value: 'Add-on: Social Media Setup — £99' },
   { emoji: '📍', name: 'Local SEO Boost',           price: '£149', value: 'Add-on: Local SEO Boost — £149' },
-  // { emoji: '📅', name: 'Booking System',            price: '£79',  value: 'Add-on: Booking System — £79' },
   { emoji: '✉️', name: 'Business Email Migration', price: '£69',  value: 'Add-on: Business Email Migration — £69' },
-  // { emoji: '📄', name: 'Privacy Policy & T&Cs',    price: '£59',  value: "Add-on: Privacy Policy & T&Cs — £59" },
+  { emoji: '🤖', name: 'Chatbot Integration',       price: '£149', value: 'Add-on: Chatbot Integration — £149' },
+  { emoji: '📅', name: 'Booking System',            price: '£79',  value: 'Add-on: Booking System — £79' },
 ]
 
 function AddonCard({ addon, onSelect, delay }) {

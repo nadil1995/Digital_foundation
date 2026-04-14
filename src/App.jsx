@@ -5,6 +5,7 @@ import Marquee from './components/Marquee'
 import HowItWorks from './components/HowItWorks'
 import Pricing from './components/Pricing'
 import Addons from './components/Addons'
+import Questionnaire from './components/Questionnaire'
 import WhySetupDesk from './components/WhySetupDesk'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -25,6 +26,7 @@ export default function App() {
       <HowItWorks />
       <Pricing onSelect={selectPackage} />
       <Addons onSelect={selectPackage} />
+      <Questionnaire onSelect={selectPackage} />
       <WhySetupDesk />
       <Contact selectedPackage={selectedPackage} setSelectedPackage={setSelectedPackage} />
       <Footer />

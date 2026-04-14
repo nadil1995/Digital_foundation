@@ -51,7 +51,8 @@ const packageOptions = [
     { value: 'Add-on: Local SEO Boost — £149',         label: 'Local SEO Boost — £149' },
     { value: 'Add-on: Booking System — £79',           label: 'Booking System — £79' },
     { value: 'Add-on: Business Email Migration — £69', label: 'Business Email Migration — £69' },
-    { value: "Add-on: Privacy Policy & T&Cs — £59",   label: 'Privacy Policy & T&Cs — £59' },
+    { value: 'Add-on: Chatbot Integration — £149',    label: 'Chatbot Integration — £149'    },
+    { value: 'Add-on: Booking System — £79',          label: 'Booking System — £79'          },
   ]},
   { group: null, options: [
     { value: 'Not sure — please advise', label: 'Not sure — please advise' },
