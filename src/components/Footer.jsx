@@ -4,6 +4,7 @@ const links = [
   { href: '#addons',        label: 'Add-ons'       },
   { href: '#questionnaire', label: 'Find My Plan'  },
   { href: '#why',           label: 'Why Us'        },
+  { href: '#faq',           label: 'FAQ'           },
   { href: '#contact',       label: 'Contact'       },
 ]
 

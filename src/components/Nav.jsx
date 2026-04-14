@@ -22,6 +22,7 @@ export default function Nav() {
     { href: '#addons',         label: 'Add-ons'       },
     { href: '#questionnaire',  label: 'Find My Plan'  },
     { href: '#why',            label: 'Why Us'        },
+    { href: '#faq',            label: 'FAQ'           },
   ]
 
   return (

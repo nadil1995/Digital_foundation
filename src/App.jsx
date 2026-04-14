@@ -7,6 +7,7 @@ import Pricing from './components/Pricing'
 import Addons from './components/Addons'
 import Questionnaire from './components/Questionnaire'
 import WhySetupDesk from './components/WhySetupDesk'
+import FAQ from './components/FAQ'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
@@ -28,6 +29,7 @@ export default function App() {
       <Addons onSelect={selectPackage} />
       <Questionnaire onSelect={selectPackage} />
       <WhySetupDesk />
+      <FAQ />
       <Contact selectedPackage={selectedPackage} setSelectedPackage={setSelectedPackage} />
       <Footer />
     </>
