@@ -60,26 +60,18 @@ function FAQItem({ faq, index }) {
     <div
       ref={ref}
       className={`faq-item reveal${index % 3 !== 0 ? ` delay-${index % 3}` : ''}`}
-      itemScope
-      itemProp="mainEntity"
-      itemType="https://schema.org/Question"
     >
       <button
         className={`faq-q${open ? ' open' : ''}`}
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
       >
-        <span itemProp="name">{faq.q}</span>
+        <span>{faq.q}</span>
         <span className="faq-icon">{open ? '−' : '+'}</span>
       </button>
       {open && (
-        <div
-          className="faq-a"
-          itemScope
-          itemProp="acceptedAnswer"
-          itemType="https://schema.org/Answer"
-        >
-          <p itemProp="text">{faq.a}</p>
+        <div className="faq-a">
+          <p>{faq.a}</p>
         </div>
       )}
     </div>
@@ -145,11 +137,7 @@ export default function FAQ() {
         }
       `}</style>
 
-      <section
-        id="faq"
-        itemScope
-        itemType="https://schema.org/FAQPage"
-      >
+      <section id="faq">
         <div className="container">
           <div ref={labelRef} className="section-label reveal">FAQ</div>
           <h2 ref={titleRef} className="section-title reveal delay-1">

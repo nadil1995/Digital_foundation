@@ -61,7 +61,7 @@ const packageOptions = [
 
 const contactInfo = [
   { icon: '✉️', label: 'Email',         value: 'hello@setupdesk.co.uk' },
-  { icon: '📞', label: 'Phone',         value: '+44 20 1234 5678' },
+  { icon: '💬', label: 'WhatsApp',      value: 'Chat on WhatsApp', href: 'https://wa.me/447417345277' },
   // { icon: '📍', label: 'Location',      value: 'South Croydon, London' },
   { icon: '⏱️', label: 'Response Time', value: 'Within 24 hours' },
 ]
@@ -142,7 +142,10 @@ export default function Contact({ selectedPackage, setSelectedPackage }) {
                 <div className="ci-icon">{c.icon}</div>
                 <div>
                   <div className="ci-lbl">{c.label}</div>
-                  <div className="ci-val">{c.value}</div>
+                  {c.href
+                    ? <a className="ci-val" href={c.href} target="_blank" rel="noopener noreferrer">{c.value}</a>
+                    : <div className="ci-val">{c.value}</div>
+                  }
                 </div>
               </div>
             ))}
